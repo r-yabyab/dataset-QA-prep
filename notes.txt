@@ -1,0 +1,12 @@
+Start
+
+Create template: {"Question": "", "Answer": ""}
+    - Append Answer when chunking, less than half the max_seq_length
+    - check for null, check for EOS within Answer
+
+
+
+play around with the token size for A. 400 is kinda big, liek a couple of methods 
+- to check how much data is just "{"
+- Map files that are done
+- Separate API docs

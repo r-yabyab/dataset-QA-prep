@@ -15,22 +15,38 @@ print(LANGUAGE_SEPARATORS)
 print(tiktoken.list_encoding_names())
 
 js_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
-    # language=Language.JS,
     model_name="gpt-3.5-turbo",
-    chunk_size=512,
+    # chunk_size=600, # a bit too big, llama 552, gpt2 743
+    # chunk_size=400,
+    chunk_size=300,
     chunk_overlap=0,
     separators=LANGUAGE_SEPARATORS,
 )
 
-file = "../data/swapples/src/components/game/GameBoardComponent.js"
-with open(file, "r", encoding="utf-8") as f:
+input_file = "../data/swapples/src/components/game/GameBoardComponent.js"
+
+parts = input_file.replace("\\", "/").split("/")
+data_index = parts.index("data")
+project_name = parts[data_index + 1]
+filename = os.path.basename(input_file)
+base_filename = os.path.splitext(filename)[0]  
+output_file_name = f"../data/outputs/{project_name}/{base_filename}.jsonl"
+
+os.makedirs(os.path.dirname(output_file_name), exist_ok=True)
+
+with open(input_file, "r", encoding="utf-8") as f:
     text = f.read()
 
     chunks = js_splitter.split_text(text)
     print(len(chunks))
-    print(chunks[3])
-    token_count = count_tokens(chunks[3])
+    print(chunks[0])
+    token_count = count_tokens(chunks[0])
     print(f"Token count for chunk 2: {token_count}")
+
+    with open(output_file_name, "w", encoding="utf-8") as out_f:
+        for chunk in chunks:
+            json_line = {"Question": "", "Answer": chunk}
+            out_f.write(json.dumps(json_line) + "\n")
 
 # all_docs = []
 

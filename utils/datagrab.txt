@@ -1,0 +1,4 @@
+gh repo list --source --limit 1000 --json name,isFork,url | jq -r '.[] | select(.isFork == false) | .url' | xargs -L1 git clone
+
+Dupes
+- Do we keep?

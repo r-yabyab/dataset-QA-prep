@@ -14,3 +14,6 @@ Preprocess QA
 
 Inference after finetune
 - Static lint outputs
+
+</br>
+gpt2 tokenizer about twice the size of llama

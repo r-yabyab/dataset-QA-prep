@@ -2,3 +2,6 @@ gh repo list --source --limit 1000 --json name,isFork,url | jq -r '.[] | select(
 
 Dupes
 - Do we keep?
+
+https://python.langchain.com/docs/how_to/code_splitter/
+https://python.langchain.com/docs/how_to/split_by_token/

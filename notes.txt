@@ -21,3 +21,7 @@ How to keep downstream context?
 
 https://github.com/microsoft/CodeBERT
 - decoders for cosine_similarity
+- graphcodebert
+==> these need to be finetuned to work
+    - https://github.com/microsoft/CodeBERT/tree/master/UniXcoder#2-similarity-between-code-and-nl
+    - use UniXcoder, pretrained on codebases, no NL

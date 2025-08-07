@@ -9,13 +9,11 @@ from tqdm import tqdm
 # === CONFIG ===
 OUTPUT_ROOT = Path("W:/Users/cayab/dataset-QA-prep/data/outputs/answers")
 LOG_PATH = Path("W:/Users/cayab/dataset-QA-prep/data/outputs/similar_chunks.txt")
-SIMILARITY_THRESHOLD = 0.996
+SIMILARITY_THRESHOLD = 0.95
 
 # === MODEL SETUP ===
-# tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/codebert-base")
-tokenizer = AutoTokenizer.from_pretrained("microsoft/codebert-base")
-# model = AutoModel.from_pretrained("sentence-transformers/codebert-base")
-model = AutoModel.from_pretrained("microsoft/codebert-base")
+tokenizer = AutoTokenizer.from_pretrained("microsoft/unixcoder-base-unimodal")
+model = AutoModel.from_pretrained("microsoft/unixcoder-base-unimodal")
 model.eval()
 
 # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

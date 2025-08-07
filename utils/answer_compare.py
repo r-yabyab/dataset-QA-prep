@@ -2,10 +2,8 @@ from transformers import AutoTokenizer, AutoModel
 import torch
 from sklearn.metrics.pairwise import cosine_similarity
 
-tokenizer = AutoTokenizer.from_pretrained("microsoft/codebert-base")
-# tokenizer = AutoTokenizer.from_pretrained("microsoft/graphcodebert-base")
-# model = AutoModel.from_pretrained("microsoft/graphcodebert-base")
-model = AutoModel.from_pretrained("microsoft/codebert-base")
+tokenizer = AutoTokenizer.from_pretrained("microsoft/unixcoder-base-unimodal")
+model = AutoModel.from_pretrained("microsoft/unixcoder-base-unimodal")
 
 def get_embedding(text):
     inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)

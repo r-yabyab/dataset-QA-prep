@@ -25,3 +25,8 @@ https://github.com/microsoft/CodeBERT
 ==> these need to be finetuned to work
     - https://github.com/microsoft/CodeBERT/tree/master/UniXcoder#2-similarity-between-code-and-nl
     - use UniXcoder, pretrained on codebases, no NL
+
+
+No empty files
+No dupes (based on semantics)
+No nulls in API docs, txt, anything non code

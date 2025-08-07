@@ -14,3 +14,10 @@ play around with the token size for A. 400 is kinda big, liek a couple of method
 
 Use cosine_similarity to find Answers that are similar, like default Index.jsx, to remove duplicates
 - microsoft/codebert-base
+
+Logging?
+
+How to keep downstream context?
+
+https://github.com/microsoft/CodeBERT
+- decoders for cosine_similarity

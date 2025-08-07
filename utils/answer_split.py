@@ -19,7 +19,7 @@ EXT_TO_LANG = {
     ".js": Language.JS,
     ".ts": Language.TS,
     ".py": Language.PYTHON,
-    ".java": Language.JAVA
+    ".java": Language.JAVA,
     ".cs": Language.CSHARP,
 }
 

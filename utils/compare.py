@@ -9,10 +9,12 @@ from tqdm import tqdm
 # === CONFIG ===
 OUTPUT_ROOT = Path("W:/Users/cayab/dataset-QA-prep/data/outputs/answers")
 LOG_PATH = Path("W:/Users/cayab/dataset-QA-prep/data/outputs/similar_chunks.txt")
-SIMILARITY_THRESHOLD = 0.98
+SIMILARITY_THRESHOLD = 0.996
 
 # === MODEL SETUP ===
+# tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/codebert-base")
 tokenizer = AutoTokenizer.from_pretrained("microsoft/codebert-base")
+# model = AutoModel.from_pretrained("sentence-transformers/codebert-base")
 model = AutoModel.from_pretrained("microsoft/codebert-base")
 model.eval()
 
@@ -43,11 +45,19 @@ for dirpath, _, filenames in os.walk(OUTPUT_ROOT):
                         answer = obj.get("Answer", "").strip()
                         if answer:
                             answers.append(answer)
-                            file_map.append((str(fpath), i + 1))
+                            ext = fpath.suffix  # e.g., ".js"
+                            file_map.append((str(fpath), i + 1, ext))
                     except json.JSONDecodeError:
                         print(f"Skipping malformed line in {fpath}")
 
 print(f"Loaded {len(answers)} answers")
+
+# Only keep first 1/10th of the data
+one_tenth_len = max(1, len(answers) // 10)
+answers = answers[:one_tenth_len]
+file_map = file_map[:one_tenth_len]
+
+print(f"Using first 1/10th of answers: {len(answers)}")
 
 # === EMBED CHUNKS ===
 embeddings = []
@@ -62,11 +72,15 @@ with open(LOG_PATH, "w", encoding="utf-8") as log_file:
     match_count = 0
     for i in tqdm(range(len(embeddings)), desc="Comparing"):
         for j in range(i + 1, len(embeddings)):
+            file1, line1, ext1 = file_map[i]
+            file2, line2, ext2 = file_map[j]
+
+            if ext1 != ext2:
+                continue  # skip comparison if file extensions differ
+
             sim = cosine_similarity([embeddings[i]], [embeddings[j]])[0][0]
             if sim >= SIMILARITY_THRESHOLD:
                 match_count += 1
-                file1, line1 = file_map[i]
-                file2, line2 = file_map[j]
                 log_file.write(
                     f"\n[Similarity: {sim:.4f}]\n"
                     f"{file1}:{line1}\n"

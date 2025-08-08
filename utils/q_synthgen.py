@@ -5,7 +5,7 @@ from openai import OpenAI
 from config import OPEN_API_KEY
 
 class QuestionSynthesizer:
-    def __init__(self, model: str = "gpt-5-mini"):
+    def __init__(self, model: str = "gpt-5-nano"):
         """
         Initialize the Question Synthesizer
         
@@ -49,7 +49,7 @@ Generate only the question in natural language, without any code blocks, formatt
             print(f"Error generating question with OpenAI: {e}")
             return "What does this code do?"
     
-    def process_jsonl_file(self, input_file: str, output_file: str = None, max_entries: int = None) -> None:
+    def process_jsonl_file(self, input_file: str, output_file: str = None, max_entries: int = None, save_interval: int = 10) -> None:
         """
         Process a JSONL file and generate questions for entries with empty questions
         
@@ -57,6 +57,7 @@ Generate only the question in natural language, without any code blocks, formatt
             input_file: Path to the input JSONL file
             output_file: Path to the output JSONL file (if None, will overwrite input)
             max_entries: Maximum number of entries to process (if None, process all)
+            save_interval: Save progress every N generations (default: 10)
         """
         if output_file is None:
             output_file = input_file
@@ -71,52 +72,71 @@ Generate only the question in natural language, without any code blocks, formatt
         print(f"Reading from: {input_file}")
         if max_entries:
             print(f"Processing maximum {max_entries} entries")
+        print(f"💾 Auto-saving every {save_interval} generations")
         
-        # Read and process each line
-        with open(input_file, 'r', encoding='utf-8') as f:
-            for line_num, line in enumerate(f, 1):
-                # Stop if we've reached the maximum number of entries
-                if max_entries and total_entries >= max_entries:
-                    break
-                    
-                line = line.strip()
-                if not line:
-                    continue
-                
-                try:
-                    entry = json.loads(line)
-                    total_entries += 1
-                    
-                    # Check if question is empty or missing
-                    if not entry.get("Question", "").strip():
-                        answer_content = entry.get("Answer", "")
+        def save_progress():
+            """Save current progress to output file"""
+            print(f"\n💾 Saving progress to: {output_file}")
+            with open(output_file, 'w', encoding='utf-8') as f:
+                for entry in processed_entries:
+                    f.write(json.dumps(entry, ensure_ascii=False) + '\n')
+            print(f"💾 Progress saved! ({len(processed_entries)} entries)")
+        
+        try:
+            # Read and process each line
+            with open(input_file, 'r', encoding='utf-8') as f:
+                for line_num, line in enumerate(f, 1):
+                    # Stop if we've reached the maximum number of entries
+                    if max_entries and total_entries >= max_entries:
+                        break
                         
-                        if answer_content.strip():
-                            print(f"\n📝 Processing entry {line_num}/{max_entries if max_entries else '?'}...")
-                            print(f"  → Code snippet preview: {answer_content[:100].replace(chr(10), ' ')[:100]}...")
-                            generated_question = self.generate_question(answer_content)
-                            entry["Question"] = generated_question
-                            generated_questions += 1
-                            print(f"  ✅ Generated question: {generated_question}")
+                    line = line.strip()
+                    if not line:
+                        continue
+                    
+                    try:
+                        entry = json.loads(line)
+                        total_entries += 1
+                        
+                        # Check if question is empty or missing
+                        if not entry.get("Question", "").strip():
+                            answer_content = entry.get("Answer", "")
+                            
+                            if answer_content.strip():
+                                print(f"\n📝 Processing entry {line_num}/{max_entries if max_entries else '?'}...")
+                                print(f"  → Code snippet preview: {answer_content[:100].replace(chr(10), ' ')[:100]}...")
+                                generated_question = self.generate_question(answer_content)
+                                entry["Question"] = generated_question
+                                generated_questions += 1
+                                print(f"  ✅ Generated question: {generated_question}")
+                                
+                                # Save progress every save_interval generations
+                                if generated_questions % save_interval == 0:
+                                    processed_entries.append(entry)
+                                    save_progress()
+                                    continue
+                            else:
+                                print(f"⚠️  Skipping entry {line_num} - no answer content")
                         else:
-                            print(f"⚠️  Skipping entry {line_num} - no answer content")
-                    else:
-                        print(f"ℹ️  Entry {line_num} already has a question, skipping")
-                    
-                    processed_entries.append(entry)
-                    
-                except json.JSONDecodeError as e:
-                    print(f"Error parsing JSON on line {line_num}: {e}")
-                    continue
-                except Exception as e:
-                    print(f"Error processing line {line_num}: {e}")
-                    continue
+                            print(f"ℹ️  Entry {line_num} already has a question, skipping")
+                        
+                        processed_entries.append(entry)
+                        
+                    except json.JSONDecodeError as e:
+                        print(f"Error parsing JSON on line {line_num}: {e}")
+                        continue
+                    except Exception as e:
+                        print(f"Error processing line {line_num}: {e}")
+                        continue
         
-        # Write the processed entries to output file
-        print(f"\n💾 Writing results to: {output_file}")
-        with open(output_file, 'w', encoding='utf-8') as f:
-            for entry in processed_entries:
-                f.write(json.dumps(entry, ensure_ascii=False) + '\n')
+        except Exception as e:
+            print(f"\n� Exception occurred: {e}")
+            print("💾 Saving current progress before exiting...")
+            save_progress()
+            raise e
+        
+        # Final save of all processed entries
+        save_progress()
         
         print(f"\n🎉 Processing complete!")
         print(f"📊 Total entries processed: {total_entries}")
@@ -145,7 +165,7 @@ def main():
     
     # Process the file
     try:
-        synthesizer.process_jsonl_file(INPUT_FILE, OUTPUT_FILE, max_entries=5)
+        synthesizer.process_jsonl_file(INPUT_FILE, OUTPUT_FILE, max_entries=5, save_interval=2)
     except Exception as e:
         print(f"Error processing file: {e}")
 

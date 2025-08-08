@@ -30,3 +30,9 @@ https://github.com/microsoft/CodeBERT
 No empty files
 No dupes (based on semantics)
 No nulls in API docs, txt, anything non code
+
+
+https://platform.openai.com/docs/api-reference/introduction
+- for synthdatagen
+
+mention language in q?

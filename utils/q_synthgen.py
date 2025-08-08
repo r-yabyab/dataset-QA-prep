@@ -1,240 +1,153 @@
-import openai
 import json
 import os
-from typing import List, Dict, Optional
-import time
+from typing import Dict, Any
+from openai import OpenAI
+from config import OPEN_API_KEY
 
-class QuestionSynthGenerator:
-    def __init__(self, api_key: Optional[str] = None):
+class QuestionSynthesizer:
+    def __init__(self, model: str = "gpt-5-mini"):
         """
-        Initialize the Question Synthesis Generator
+        Initialize the Question Synthesizer
         
         Args:
-            api_key: OpenAI API key. If None, will try to get from environment variable OPENAI_API_KEY
+            model: Model name to use for generation
         """
-        if api_key:
-            openai.api_key = api_key
-        else:
-            openai.api_key = os.getenv('OPENAI_API_KEY')
-            
-        if not openai.api_key:
-            raise ValueError("OpenAI API key not provided. Set OPENAI_API_KEY environment variable or pass api_key parameter.")
+        self.model = model
+        self.client = OpenAI(api_key=OPEN_API_KEY)
     
-    def generate_question_from_answer(self, answer: str, context: str = "", programming_language: str = "", difficulty: str = "medium") -> str:
-        """
-        Generate a question based on the provided answer
-        
-        Args:
-            answer: The code answer to generate a question for
-            context: Additional context about the problem domain
-            programming_language: The programming language of the answer
-            difficulty: Difficulty level (easy, medium, hard)
-            
-        Returns:
-            Generated question string
-        """
-        
-        prompt = f"""You are an expert programming instructor. Given the following code answer, generate a clear, specific programming question that would naturally lead to this solution.
+    def generate_question(self, code_content: str) -> str:
+        prompt = f"""Given the following code, generate a clear and specific question that this code would be an appropriate answer to. The question should be practical and educational, focusing on what the code does, how it works, or what problem it solves.
 
-Programming Language: {programming_language if programming_language else "Auto-detect"}
-Difficulty Level: {difficulty}
-Context: {context if context else "General programming problem"}
-
-Code Answer:
+Code:
 ```
-{answer}
+{code_content}
 ```
 
-Requirements for the question:
-1. Be specific and clear about what needs to be implemented
-2. Include any necessary constraints or requirements
-3. Specify input/output format if applicable
-4. Make it challenging but fair for the given difficulty level
-5. Don't reveal the exact solution approach
-
-Generate only the question text, no additional commentary:"""
+Generate only the question in natural language, without any code blocks, formatting, or additional explanation. Don't make observations."""
 
         try:
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",  # You can change to gpt-4 if needed
+            print(f"  → Sending request to OpenAI...")
+            response = self.client.chat.completions.create(
+                model=self.model,
                 messages=[
-                    {"role": "system", "content": "You are an expert programming instructor who creates clear, specific questions from code solutions."},
                     {"role": "user", "content": prompt}
                 ],
-                max_tokens=500,
-                temperature=0.7
+                max_completion_tokens=1000,
+                temperature=1,
             )
             
-            return response.choices[0].message.content.strip()
+            generated_text = response.choices[0].message.content.strip()
+            
+            # Clean up the generated question
+            # Remove any quotes or formatting that might have been added
+            generated_text = generated_text.strip('"\'`')
+            
+            print(f"  → Received response: {generated_text}")
+            return generated_text if generated_text else "What does this code do?"
             
         except Exception as e:
-            print(f"Error generating question: {e}")
-            return None
+            print(f"Error generating question with OpenAI: {e}")
+            return "What does this code do?"
     
-    def process_single_answer(self, answer: str, **kwargs) -> Dict[str, str]:
+    def process_jsonl_file(self, input_file: str, output_file: str = None, max_entries: int = None) -> None:
         """
-        Process a single answer and return question-answer pair
+        Process a JSONL file and generate questions for entries with empty questions
         
         Args:
-            answer: The code answer
-            **kwargs: Additional parameters for question generation
-            
-        Returns:
-            Dictionary with 'question' and 'answer' keys
+            input_file: Path to the input JSONL file
+            output_file: Path to the output JSONL file (if None, will overwrite input)
+            max_entries: Maximum number of entries to process (if None, process all)
         """
-        question = self.generate_question_from_answer(answer, **kwargs)
+        if output_file is None:
+            output_file = input_file
         
-        return {
-            "question": question,
-            "answer": answer,
-            "metadata": {
-                "programming_language": kwargs.get("programming_language", ""),
-                "difficulty": kwargs.get("difficulty", "medium"),
-                "context": kwargs.get("context", "")
-            }
-        }
-    
-    def process_answers_from_file(self, file_path: str, output_path: str = None, **kwargs) -> List[Dict[str, str]]:
-        """
-        Process answers from a file and generate questions
+        if not os.path.exists(input_file):
+            raise FileNotFoundError(f"Input file not found: {input_file}")
         
-        Args:
-            file_path: Path to file containing answers (one per line or JSON format)
-            output_path: Path to save the generated Q&A pairs
-            **kwargs: Additional parameters for question generation
-            
-        Returns:
-            List of question-answer dictionaries
-        """
-        qa_pairs = []
+        processed_entries = []
+        total_entries = 0
+        generated_questions = 0
         
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                if file_path.endswith('.json'):
-                    data = json.load(f)
-                    if isinstance(data, list):
-                        answers = data
+        print(f"Reading from: {input_file}")
+        if max_entries:
+            print(f"Processing maximum {max_entries} entries")
+        
+        # Read and process each line
+        with open(input_file, 'r', encoding='utf-8') as f:
+            for line_num, line in enumerate(f, 1):
+                # Stop if we've reached the maximum number of entries
+                if max_entries and total_entries >= max_entries:
+                    break
+                    
+                line = line.strip()
+                if not line:
+                    continue
+                
+                try:
+                    entry = json.loads(line)
+                    total_entries += 1
+                    
+                    # Check if question is empty or missing
+                    if not entry.get("Question", "").strip():
+                        answer_content = entry.get("Answer", "")
+                        
+                        if answer_content.strip():
+                            print(f"\n📝 Processing entry {line_num}/{max_entries if max_entries else '?'}...")
+                            print(f"  → Code snippet preview: {answer_content[:100].replace(chr(10), ' ')[:100]}...")
+                            generated_question = self.generate_question(answer_content)
+                            entry["Question"] = generated_question
+                            generated_questions += 1
+                            print(f"  ✅ Generated question: {generated_question}")
+                        else:
+                            print(f"⚠️  Skipping entry {line_num} - no answer content")
                     else:
-                        answers = [data]
-                else:
-                    answers = [line.strip() for line in f.readlines() if line.strip()]
-            
-            for i, answer in enumerate(answers):
-                print(f"Processing answer {i+1}/{len(answers)}...")
-                
-                if isinstance(answer, dict):
-                    # If answer is a dict, extract the actual answer content
-                    answer_text = answer.get('answer', answer.get('code', str(answer)))
-                    context = answer.get('context', kwargs.get('context', ''))
-                    lang = answer.get('language', kwargs.get('programming_language', ''))
-                    difficulty = answer.get('difficulty', kwargs.get('difficulty', 'medium'))
-                else:
-                    answer_text = str(answer)
-                    context = kwargs.get('context', '')
-                    lang = kwargs.get('programming_language', '')
-                    difficulty = kwargs.get('difficulty', 'medium')
-                
-                qa_pair = self.process_single_answer(
-                    answer_text,
-                    context=context,
-                    programming_language=lang,
-                    difficulty=difficulty
-                )
-                
-                if qa_pair['question']:  # Only add if question generation was successful
-                    qa_pairs.append(qa_pair)
-                
-                # Add a small delay to respect API rate limits
-                time.sleep(1)
+                        print(f"ℹ️  Entry {line_num} already has a question, skipping")
+                    
+                    processed_entries.append(entry)
+                    
+                except json.JSONDecodeError as e:
+                    print(f"Error parsing JSON on line {line_num}: {e}")
+                    continue
+                except Exception as e:
+                    print(f"Error processing line {line_num}: {e}")
+                    continue
         
-        except Exception as e:
-            print(f"Error processing file: {e}")
-            return qa_pairs
+        # Write the processed entries to output file
+        print(f"\n💾 Writing results to: {output_file}")
+        with open(output_file, 'w', encoding='utf-8') as f:
+            for entry in processed_entries:
+                f.write(json.dumps(entry, ensure_ascii=False) + '\n')
         
-        # Save to output file if specified
-        if output_path:
-            self.save_qa_pairs(qa_pairs, output_path)
-        
-        return qa_pairs
-    
-    def save_qa_pairs(self, qa_pairs: List[Dict[str, str]], output_path: str):
-        """
-        Save question-answer pairs to a file
-        
-        Args:
-            qa_pairs: List of Q&A dictionaries
-            output_path: Path to save the file
-        """
-        try:
-            with open(output_path, 'w', encoding='utf-8') as f:
-                json.dump(qa_pairs, f, indent=2, ensure_ascii=False)
-            print(f"Saved {len(qa_pairs)} Q&A pairs to {output_path}")
-        except Exception as e:
-            print(f"Error saving file: {e}")
-    
-    def append_questions_to_existing(self, qa_pairs: List[Dict[str, str]], existing_file: str):
-        """
-        Append new Q&A pairs to an existing file
-        
-        Args:
-            qa_pairs: New Q&A pairs to append
-            existing_file: Path to existing file
-        """
-        try:
-            # Load existing data
-            if os.path.exists(existing_file):
-                with open(existing_file, 'r', encoding='utf-8') as f:
-                    existing_data = json.load(f)
-            else:
-                existing_data = []
-            
-            # Append new pairs
-            existing_data.extend(qa_pairs)
-            
-            # Save updated data
-            self.save_qa_pairs(existing_data, existing_file)
-            
-        except Exception as e:
-            print(f"Error appending to file: {e}")
+        print(f"\n🎉 Processing complete!")
+        print(f"📊 Total entries processed: {total_entries}")
+        print(f"❓ Questions generated: {generated_questions}")
+        print(f"📁 Output written to: {output_file}")
 
-
-# Example usage functions
-def example_usage():
-    """Example of how to use the QuestionSynthGenerator"""
+def main():
+    """Main function to run the question synthesizer"""
     
-    # Initialize generator (you'll provide the API key)
-    generator = QuestionSynthGenerator()  # Will use OPENAI_API_KEY env variable
+    # Configuration
+    INPUT_FILE = r"w:\Users\cayab\dataset-QA-prep\data\outputs\concated.jsonl"
+    OUTPUT_FILE = r"w:\Users\cayab\dataset-QA-prep\data\outputs\concated_with_questions.jsonl"
+    MODEL = "gpt-5-mini"
     
-    # Example 1: Generate question from a single answer
-    code_answer = """
-def fibonacci(n):
-    if n <= 1:
-        return n
-    return fibonacci(n-1) + fibonacci(n-2)
-"""
+    # Initialize synthesizer
+    synthesizer = QuestionSynthesizer(model=MODEL)
     
-    qa_pair = generator.process_single_answer(
-        code_answer,
-        programming_language="Python",
-        difficulty="medium",
-        context="Recursive algorithms"
-    )
+    # Test OpenAI connection
+    try:
+        test_response = synthesizer.client.models.list()
+        print("✓ Successfully connected to OpenAI")
+    except Exception as e:
+        print(f"✗ Failed to connect to OpenAI: {e}")
+        print("Please ensure your OpenAI API key is valid")
+        return
     
-    print("Generated Q&A pair:")
-    print(f"Q: {qa_pair['question']}")
-    print(f"A: {qa_pair['answer']}")
-    
-    # Example 2: Process multiple answers from a file
-    # qa_pairs = generator.process_answers_from_file(
-    #     "answers.txt",
-    #     output_path="generated_qa.json",
-    #     programming_language="Python",
-    #     difficulty="medium"
-    # )
-
+    # Process the file
+    try:
+        synthesizer.process_jsonl_file(INPUT_FILE, OUTPUT_FILE, max_entries=5)
+    except Exception as e:
+        print(f"Error processing file: {e}")
 
 if __name__ == "__main__":
-    # Set your OpenAI API key here or as environment variable
-    # os.environ['OPENAI_API_KEY'] = 'your-api-key-here'
-    
-    example_usage()
+    main()

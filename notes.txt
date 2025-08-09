@@ -29,6 +29,7 @@ https://github.com/microsoft/CodeBERT
 
 No empty files
 No dupes (based on semantics)
+    - what mean by semantics? can have different ways to write a code that does the same thing? Or more of structure?
 No nulls in API docs, txt, anything non code
 - how to deal with false positives /negatives?
 
@@ -61,3 +62,16 @@ Unsloth: Will smartly offload gradients to save VRAM!
 
 - how to deal with edge cases at inference?
     - should be caught by tests
+    - examples like deprecated, no longer in use classes from 3rd party APIs
+
+
+- do we need tracing?
+    - https://milvus.io/ai-quick-reference/how-do-i-test-and-debug-langchain-applications
+
+
+https://www.reddit.com/r/LocalLLaMA/comments/1aujfiz/real_free_alternative_to_langsmith/
+
+
+tree-sitter
+- is not a parser, but a parser generator to generate parsers for diff programming languages
+    - to do this, needs grammar which is in here

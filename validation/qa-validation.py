@@ -4,7 +4,6 @@ from collections import defaultdict
 from pathlib import Path
 
 def load_jsonl_dataset(file_path):
-    """Load a JSONL dataset from file"""
     dataset = []
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
@@ -39,7 +38,6 @@ def validate_qa_dataset(dataset):
             format_errors["data_type"] += 1
             continue
         
-        # Check for required keys
         if "Question" not in ex:
             format_errors["missing_question_key"] += 1
         if "Answer" not in ex:
@@ -51,7 +49,6 @@ def validate_qa_dataset(dataset):
         if unexpected_keys:
             format_errors["unexpected_keys"] += 1
         
-        # Validate Question field
         question = ex.get("Question", None)
         if question is None:
             format_errors["question_is_null"] += 1
@@ -60,7 +57,6 @@ def validate_qa_dataset(dataset):
         elif question.strip() != "":
             format_errors["question_is_empty"] += 1
         
-        # Validate Answer field
         answer = ex.get("Answer", None)
         if answer is None:
             format_errors["answer_is_null"] += 1
@@ -74,10 +70,8 @@ def validate_qa_dataset(dataset):
     return format_errors
 
 def main():
-    # Set the file path directly in the script
     file_path = "../data/testing/concated_with_questions-080725-2123-mini.jsonl"
     
-    # Load dataset
     print(f"Loading dataset from: {file_path}")
     dataset = load_jsonl_dataset(file_path)
     
@@ -85,10 +79,8 @@ def main():
         print("No valid entries found in dataset")
         sys.exit(1)
     
-    # Validate dataset
     format_errors = validate_qa_dataset(dataset)
     
-    # Print results
     if format_errors:
         print("\nFound errors:")
         for error_type, count in format_errors.items():

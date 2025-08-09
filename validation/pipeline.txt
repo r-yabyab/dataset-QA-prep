@@ -6,6 +6,16 @@ Problem: Different programming languages, static parsing
     a. Lang separators through LangChain (code snippets, not validated)
     b. AST
         requires separate parsers for each language
+        https://github.com/github/CodeSearchNet?tab=readme-ov-file#data
+        - split into 2m (comment, code): 
+            - comments are top-level fx and method comments (like python docstring)
+            code is entire fx / method
+        https://arxiv.org/pdf/1909.09436 (Semantic Code Search paper)
+        Filters:
+            - comments less than 3 token filtered
+            - fx names with substring "test"
+        https://huggingface.co/datasets/AhmedSSoliman/CodeSearchNet-Python
+        - example datasets
 2. Filter
     a. Small answers 
     b. Sensitive material
@@ -13,6 +23,7 @@ Problem: Different programming languages, static parsing
 3. Generate synthetic Qs
     a. Based on Answer alone
     b. Based on Answer + RAG context (pass Answer, no LLM if possible?) to maintain context
+        --> Answer (source code snippet) + context
 4. Template to LLM
 5. Split into train and eval datasets
     - default params on full v. half size dataset, then change params
@@ -20,6 +31,11 @@ Problem: Different programming languages, static parsing
 
 ---
 Inference Validation
-    - 
+    a. Static parse
+    b. Run code snippet
+        ==> need to pass through docker containers maybe
+
+
+---
 
 

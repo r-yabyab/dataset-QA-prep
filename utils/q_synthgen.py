@@ -165,7 +165,7 @@ def main():
     
     # Process the file
     try:
-        synthesizer.process_jsonl_file(INPUT_FILE, OUTPUT_FILE, max_entries=5, save_interval=2)
+        synthesizer.process_jsonl_file(INPUT_FILE, OUTPUT_FILE, max_entries=None, save_interval=5)
     except Exception as e:
         print(f"Error processing file: {e}")
 

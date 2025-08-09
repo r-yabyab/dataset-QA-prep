@@ -30,9 +30,34 @@ https://github.com/microsoft/CodeBERT
 No empty files
 No dupes (based on semantics)
 No nulls in API docs, txt, anything non code
+- how to deal with false positives /negatives?
+
+How to separate dev and prod?
 
 
 https://platform.openai.com/docs/api-reference/introduction
 - for synthdatagen
+    https://platform.openai.com/usage
 
 mention language in q?
+
+
+Best practices
+https://platform.openai.com/docs/guides/rft-use-cases
+    - NL to structured code that must pass deterministic tests
+https://platform.openai.com/docs/guides/fine-tuning-best-practices
+    - general finetuning dataset best practices (on openai platform, but applies elsewhere)
+
+
+Logging
+- log on half, then full
+- then half w/ eval, then full with eval
+    Log starting loss, end loss, 
+
+Unsloth: Will smartly offload gradients to save VRAM!
+{'loss': 2.3386, 'grad_norm': 0.40640297532081604, 'learning_rate': 0.0, 'epoch': 0.01}
+
+- try wandb
+
+- how to deal with edge cases at inference?
+    - should be caught by tests

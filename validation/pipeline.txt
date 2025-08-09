@@ -1,0 +1,25 @@
+Dev:
+Goal: generate code at inference based on my github repositories
+Problem: Different programming languages, static parsing
+
+1. Split each file into less than 500 tokens (llama-7b) into A in Q by:
+    a. Lang separators through LangChain (code snippets, not validated)
+    b. AST
+        requires separate parsers for each language
+2. Filter
+    a. Small answers 
+    b. Sensitive material
+    c. Dupes (through code embedding then cosine_sim)
+3. Generate synthetic Qs
+    a. Based on Answer alone
+    b. Based on Answer + RAG context (pass Answer, no LLM if possible?) to maintain context
+4. Template to LLM
+5. Split into train and eval datasets
+    - default params on full v. half size dataset, then change params
+    - use logger (wandb)
+
+---
+Inference Validation
+    - 
+
+

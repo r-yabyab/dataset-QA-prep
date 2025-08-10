@@ -25,9 +25,13 @@ Problem: Different programming languages, static parsing
         - https://github.com/github/CodeSearchNet/blob/master/notebooks/ExploreData.ipynb
 
 2. Filter
-    a. Small answers 
+    a. Small answers through characters, large through tokenizer
     b. Sensitive material
-    c. Dupes (through code embedding then cosine_sim)
+    c. Dupes (through code embedding with uniXcoder then cosine_sim)
+        - cosine sim catches exact copies, threshhold can be observed manually per language
+        - turn into docstrings and compare to catch any strays if any
+    d. Code that doesn't work
+    ==> count number of methods filtered out and output to different dir for manual inspection
 3. Generate synthetic Qs
     a. Based on Answer alone
     b. Based on Answer + RAG context (pass Answer, no LLM if possible?) to maintain context

@@ -86,3 +86,4 @@ To do:
     - tree-sitter for basic syntax checking, but for type-errors and variables, use an actual linter (docker images?)
         - generate smoke tests from GPT-5 based on langs, when have finetuned, run half and full inference based on these prompts.
             - Generate all outputs, once get outputs, run all outputs through linting. This is the test suite.
+- turn Q&A templating into pynb

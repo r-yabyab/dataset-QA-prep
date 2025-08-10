@@ -1,18 +1,20 @@
-import spacy
+import torch
 from sklearn.metrics.pairwise import cosine_similarity
+from transformers import AutoTokenizer, AutoModel
 
-# Load a spaCy model with vectors (e.g., en_core_web_md or en_core_web_lg)
-nlp = spacy.load("en_core_web_md")
+tokenizer = AutoTokenizer.from_pretrained("microsoft/unixcoder-base-unimodal")
+model = AutoModel.from_pretrained("microsoft/unixcoder-base-unimodal")
 
-def get_spacy_embedding(text):
-    doc = nlp(text)
-    return doc.vector
+def get_embedding(text):
+    inputs = tokenizer(text, return_tensors="pt")
+    with torch.no_grad():
+        outputs = model(**inputs)
+    return outputs.last_hidden_state.mean(dim=1)
 
-# Example comparison
-emb1 = get_spacy_embedding("for i in range(10): print(i)")
-emb2 = get_spacy_embedding("while i < 10: print(i); i += 1")
+emb1 = get_embedding("for i in range(10): print(i)")
+emb2 = get_embedding("while i < 10: print(i); i += 1")
 
-embed1 = get_spacy_embedding(
+embed1 = get_embedding(
 """
 const puppeteer = require('puppeteer');
 const { KnownDevices } = require('puppeteer');
@@ -64,7 +66,7 @@ sendOrder();
 """
 )
 
-embed2 = get_spacy_embedding(
+embed2 = get_embedding(
 """
 function DataFetch ({openMarket}) {
   
@@ -121,5 +123,8 @@ function DataFetch ({openMarket}) {
 """
 )
 
-similarity = cosine_similarity([embed1], [embed2])
-print("Cosine similarity:", similarity[0][0])
+similarity = cosine_similarity(emb1.numpy(), emb2.numpy())[0][0]
+print(f"Cosine similarity between emb1 and emb2: {similarity:.4f}")
+
+
+

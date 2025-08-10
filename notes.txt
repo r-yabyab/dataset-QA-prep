@@ -75,3 +75,12 @@ https://www.reddit.com/r/LocalLLaMA/comments/1aujfiz/real_free_alternative_to_la
 tree-sitter
 - is not a parser, but a parser generator to generate parsers for diff programming languages
     - to do this, needs grammar which is in here
+    https://tree-sitter.github.io/tree-sitter/7-playground.html
+        - playground
+
+To do:
+- use actual java repo
+- split on functions with AST parser
+- finetune on half and full both with training and eval
+    - compare eval loss as a metric on learning
+    - tree-sitter for basic syntax checking, but for type-errors and variables, use an actual linter (docker images?)

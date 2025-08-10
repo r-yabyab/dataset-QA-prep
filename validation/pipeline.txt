@@ -9,13 +9,21 @@ Problem: Different programming languages, static parsing
         https://github.com/github/CodeSearchNet?tab=readme-ov-file#data
         - split into 2m (comment, code): 
             - comments are top-level fx and method comments (like python docstring)
-            code is entire fx / method
+            - code is entire fx / method
         https://arxiv.org/pdf/1909.09436 (Semantic Code Search paper)
-        Filters:
+        - Filters:
             - comments less than 3 token filtered
             - fx names with substring "test"
         https://huggingface.co/datasets/AhmedSSoliman/CodeSearchNet-Python
-        - example datasets
+        - example datasets for python in (code, doc text)
+        https://huggingface.co/datasets/sentence-transformers/codesearchnet
+        - various langs, (comment, code)
+        https://huggingface.co/datasets/claudios/code_search_net
+        - reupload of 2m dataset for python
+        S3 bucket datasets from CodeSearchNet could be found like this:
+        - ds = load_dataset("code_search_net", "python")
+        - https://github.com/github/CodeSearchNet/blob/master/notebooks/ExploreData.ipynb
+
 2. Filter
     a. Small answers 
     b. Sensitive material

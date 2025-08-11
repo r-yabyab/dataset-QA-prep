@@ -60,9 +60,11 @@ def format_jsonl_to_conversations(input_file, output_file):
         print(f"Output saved to: {output_file}")
 
 def main():
-    input_file = "W:/Users/cayab/dataset-QA-prep/data/outputs/concated_with_questions.jsonl"
-    output_file = "w:/Users/cayab/dataset-QA-prep/data/outputs/formatted_conversations.jsonl"
-    
+    # input_file = "W:/Users/cayab/dataset-QA-prep/data/outputs/concated_with_questions.jsonl"
+    # output_file = "w:/Users/cayab/dataset-QA-prep/data/outputs/formatted_conversations.jsonl"
+    input_file = "W:/Users/cayab/dataset-QA-prep/data/java-data/completed.jsonl"
+    output_file = "W:/Users/cayab/dataset-QA-prep/data/java-data/data.jsonl"
+
     # Ensure output directory exists
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
     

@@ -87,3 +87,11 @@ To do:
         - generate smoke tests from GPT-5 based on langs, when have finetuned, run half and full inference based on these prompts.
             - Generate all outputs, once get outputs, run all outputs through linting. This is the test suite.
 - turn Q&A templating into pynb
+
+
+Testing
+- create functional test of code generation in java and run it through a docker container
+pass@k
+
+Docling (https://github.com/docling-project/docling) for data prep
+- could be used for documentations maybe

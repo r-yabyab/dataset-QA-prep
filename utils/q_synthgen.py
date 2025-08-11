@@ -16,7 +16,7 @@ class QuestionSynthesizer:
         self.client = OpenAI(api_key=OPEN_API_KEY)
     
     def generate_question(self, code_content: str) -> str:
-        prompt = f"""Given the following code, generate a clear and specific question that this code would be an appropriate answer to. The question should be practical and educational, focusing on what the code does, how it works, or what problem it solves.
+        prompt = f"""Given the following Java code, generate a clear and specific question that this code would be an appropriate answer to. The question should be practical and educational, focusing on what the code does, how it works, or what problem it solves.
 
 Code:
 ```
@@ -147,8 +147,10 @@ def main():
     """Main function to run the question synthesizer"""
     
     # Configuration
-    INPUT_FILE = r"w:\Users\cayab\dataset-QA-prep\data\outputs\concated.jsonl"
-    OUTPUT_FILE = r"w:\Users\cayab\dataset-QA-prep\data\outputs\concated_with_questions.jsonl"
+    # INPUT_FILE = r"w:\Users\cayab\dataset-QA-prep\data\outputs\concated.jsonl"
+    INPUT_FILE = r"W:\Users\cayab\dataset-QA-prep\data\java-data\parsed_java_functions_removesmall.jsonl"
+    # OUTPUT_FILE = r"w:\Users\cayab\dataset-QA-prep\data\outputs\concated_with_questions.jsonl"
+    OUTPUT_FILE = r"W:\Users\cayab\dataset-QA-prep\data\java-data\completed.jsonl"
     MODEL = "gpt-5-mini"
     
     # Initialize synthesizer

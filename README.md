@@ -5,6 +5,7 @@ Scripts to prepare source code into Question, Answer dataset samples for code ge
 
 ### Workflow
 - Split source code
+    - Filter out unwanted data via .gitignore first, like node_modules/
     - Turn into AST then parse by function. Output into Answer fields using <b>tree-sitter</b>
 - Filter out small and large samples
     - Tokenize Answers with LLM's tokenizer
@@ -16,8 +17,6 @@ Scripts to prepare source code into Question, Answer dataset samples for code ge
     - Compare samples via cosine_similarity
         - Can detect exact string duplicates @ 1.00, best to implement actual string checker as a fail-safe
         - Sorts filtered data from highest to threshhold, used to help determine the best cutoff to find duplicates based on language, data
-- Filter out unwated data
-    - e.g. node_modules/, paths from .gitignore
 - Question synthetic generation
     - gpt-5-nano generates Question based on Answer
     - Appends to Question

@@ -1,4 +1,0 @@
-1. Learned about the basics of finetuning LoRa adapters with unsloth, from data curating, which consisted of gathering,
-sanitizing, and loading into templates, to running inference.
-
-2. Preprocessing data. Split source code, duplicate

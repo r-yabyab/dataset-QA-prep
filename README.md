@@ -1,6 +1,6 @@
 # dataset-QA-prep
 
-Scripts to prepare data into Question, Answer pairs for code generation SFT. Logs filtered data into separate files.
+Scripts to prepare source code into Question, Answer dataset samples for code generation SFT. Logs filtered data into separate files.
 </br>
 
 ### Workflow
@@ -16,6 +16,8 @@ Scripts to prepare data into Question, Answer pairs for code generation SFT. Log
     - Compare samples via cosine_similarity
         - Can detect exact string duplicates @ 1.00, best to implement actual string checker as a fail-safe
         - Sorts filtered data from highest to threshhold, used to help determine the best cutoff to find duplicates based on language, data
+- Filter out unwated data
+    - e.g. node_modules/, paths from .gitignore
 - Question synthetic generation
     - gpt-5-nano generates Question based on Answer
     - Appends to Question

@@ -5,3 +5,6 @@ throwaways/
 pass@k/
 validation/
 rag1/
+outputs-full/
+unsloth_compiled_cache/
+vectordb/

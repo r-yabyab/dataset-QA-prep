@@ -1,0 +1,15 @@
+{
+    "project_name": "netty",              # Project name (netty, Telegram-X, termux-app)
+    "file_type": "java_source",           # Type of file
+    "relative_path": "src/main/java/...", # Path within project
+    "package": "io.netty.channel",        # Java package name
+    "class_name": "ChannelHandler",       # Java class name
+    "module": "codec-http",               # Maven/Gradle module
+    "source_type": "main",                # main, test, etc.
+    "file_extension": ".java",            # File extension
+    
+    # Chunk-specific metadata added during splitting:
+    "chunk_index": 0,                     # Which chunk this is (0, 1, 2...)
+    "chunk_type": "code_chunk",           # Type of chunk
+    "total_chunks": 5               
+} 

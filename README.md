@@ -13,6 +13,7 @@ Scripts to prepare source code into Question, Answer dataset samples for code ge
 - Filter out duplicates
     - Code embeddings with uniXcoder 
         - https://github.com/microsoft/CodeBERT/tree/master/UniXcoder
+        - https://arxiv.org/pdf/1909.09436
         - Embeds code based on syntax and semantics for multiple languages
     - Compare samples via cosine_similarity
         - Can detect exact string duplicates @ 1.00, best to implement actual string checker as a fail-safe

@@ -63,6 +63,7 @@ Unsloth: Will smartly offload gradients to save VRAM!
 - how to deal with edge cases at inference?
     - should be caught by tests
     - examples like deprecated, no longer in use classes from 3rd party APIs
+    - feed API docs
 
 
 - do we need tracing?
@@ -90,8 +91,20 @@ To do:
 
 
 Testing
-- create functional test of code generation in java and run it through a docker container
-pass@k
+- CodeBleu for comparing candidate code (inference) v. example
+        - tests syntax and data flow to reference code
+        - measure syntax and data flow
+    - static measure, compares syntax and dataflow compared to ref
+    - quick, doesn't require sandboxing
+    - architecture, structure, and code quality, esp for complex generations
+    ==> used for static evaluation
+- pass@k
+        - checks if can compiles and pass test cases
+        - measures functional correctness
+    - good for more concise functions
 
 Docling (https://github.com/docling-project/docling) for data prep
 - could be used for documentations maybe
+
+https://github.com/ncoop57/function_parser
+- pypi, forked from codesearchnet's tree-sitter parsing method

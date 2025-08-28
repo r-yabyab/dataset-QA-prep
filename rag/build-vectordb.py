@@ -80,7 +80,8 @@ class JavaProjectProcessor:
         self.project_configs = {
             'netty': {'type': 'maven', 'language': 'java'},
             'Telegram-X': {'type': 'gradle', 'language': 'java'},
-            'termux-app': {'type': 'gradle', 'language': 'java'}
+            'termux-app': {'type': 'gradle', 'language': 'java'},
+            'LeetCode-in-Java': {'type': 'maven', 'language': 'java'}
         }
     
     def should_exclude_path(self, path: Path) -> bool:

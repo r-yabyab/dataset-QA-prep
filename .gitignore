@@ -8,3 +8,5 @@ rag1/
 outputs-full/
 unsloth_compiled_cache/
 vectordb/
+vectordb*/
+outputs*/

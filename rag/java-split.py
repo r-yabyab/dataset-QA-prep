@@ -21,7 +21,7 @@ print(f"Total Java documents loaded: {len(documents)}")
 # Step 2: Set up LangChain Java code splitter
 splitter = RecursiveCharacterTextSplitter.from_language(
     language=Language.JAVA,
-    chunk_size=512,
+    chunk_size=800,
     chunk_overlap=50,
 )
 
